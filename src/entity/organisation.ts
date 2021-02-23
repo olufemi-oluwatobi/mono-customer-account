@@ -5,13 +5,14 @@ import {
     Unique,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToOne
+    JoinTable,
+    ManyToMany
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import { User } from "./user"
 
 @Entity()
-@Unique(["customer_chat_url"])
+@Unique(["customer_chat_url", "name"])
 
 export class Organisation {
     @PrimaryGeneratedColumn()
@@ -24,8 +25,10 @@ export class Organisation {
     @Column()
     customer_chat_url: string
 
-    @ManyToOne(() => User, user => user.organisations)
-    user: User;
+
+    @ManyToMany(() => User, user => user.organisations)
+    @JoinTable()
+    user: User[];
 
     @Column()
     @CreateDateColumn()
