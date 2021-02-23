@@ -11,5 +11,10 @@
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true
-   }
+   },
+   "typeRoots": [
+      "@types",
+      "./node_modules/@types",
+    ] 
+   
 }

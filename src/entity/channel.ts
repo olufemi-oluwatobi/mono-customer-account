@@ -17,6 +17,7 @@ import { User } from "./user"
 
 
 @Entity()
+
 export class Channel {
     @PrimaryGeneratedColumn()
     id: number;
