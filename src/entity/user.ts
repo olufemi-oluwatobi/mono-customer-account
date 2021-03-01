@@ -15,16 +15,19 @@ import { Channel } from "./channel"
 
 
 @Entity()
-@Unique(["username"])
+@Unique(["username", "email"])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  @Length(4, 20)
+  @Column({ nullable: true })
   username: string;
 
   @Column()
+  @Length(3, 30)
+  email: string
+
+  @Column({ select: false })
   @Length(4, 100)
   password: string;
 
@@ -34,9 +37,6 @@ export class User {
 
   @OneToMany(() => Organisation, organisation => organisation.user)
   organisations: Organisation[];
-
-  @OneToMany(() => Channel, channel => channel.user)
-  channels: Channel[];
 
   @Column()
   @CreateDateColumn()

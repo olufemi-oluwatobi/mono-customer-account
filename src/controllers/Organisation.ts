@@ -17,7 +17,6 @@ class OrganisationController {
 
 
     // }
-
     static create = async (req: Request, res: Response) => {
         try {
             console.log("locals", res.locals)

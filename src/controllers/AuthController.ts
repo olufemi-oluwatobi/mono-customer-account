@@ -40,6 +40,48 @@ class AuthController {
     res.status(200).json({ data: { token } })
   };
 
+  static signup = async (req: Request, res: Response) => {
+    try {
+      //Check if username and password are set
+      let { email, password } = req.body;
+      console.log(req.body)
+      if (!(email && password)) {
+        res.status(400).send();
+      }
+
+      //Get user from database
+      const userRepository = getRepository(User);
+      let user: User;
+
+      user = await userRepository.findOne({ where: { email } });
+      if (user) {
+        res.status(400).json({ success: false, data: "email alread exists" })
+        return
+      }
+      user = new User()
+
+      user.email = email;
+      user.password = password;
+      user.role = "basic";
+      user.hashPassword()
+
+      user = await userRepository.save(user)
+      //Check if encrypted password match
+      if (!user) {
+        res.status(500).json({ success: false, data: "failed to create user" })
+        return
+      }
+
+
+      //Send the jwt in the response
+      res.status(200).json({ data: { user } })
+    } catch (error) {
+      console.log(error)
+      res.status(401).json({ success: false, data: { error: error.toString() } });
+    }
+
+  };
+
   static changePassword = async (req: Request, res: Response) => {
     //Get ID from JWT
     const id = res.locals.jwtPayload.userId;

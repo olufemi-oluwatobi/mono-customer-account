@@ -7,7 +7,8 @@ import {
     UpdateDateColumn,
     OneToOne,
     JoinColumn,
-    ManyToOne
+    ManyToOne,
+    ManyToMany
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
@@ -27,6 +28,9 @@ export class Channel {
     name: string;
 
     @Column()
+    description: string;
+
+    @Column()
     @Length(4, 100)
     isPrivate: string;
 
@@ -34,12 +38,9 @@ export class Channel {
     @IsNotEmpty()
     role: string;
 
-    @OneToOne(() => Organisation)
-    @JoinColumn()
-    organisation: Organisation;
 
-    @ManyToOne(() => User, user => user.channels)
-    user: User;
+    @ManyToOne(() => Organisation, org => org.channels)
+    organisation: Organisation;
 
     @Column()
     @CreateDateColumn()
