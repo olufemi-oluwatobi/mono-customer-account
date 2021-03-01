@@ -2,9 +2,15 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
-
-import { User } from "../entity/user";
+import { User, AccessCode } from "../entity";
 import config from "../config/config";
+import { container } from "../config/di/container"
+import Types from "../config/di/types"
+import { Mail } from "../config/interfaces"
+import accessCodeTemplate from "../templates/accesscode.template"
+
+const mail = container.get<Mail>(Types.MailService)
+console.log(mail)
 
 class AuthController {
   static login = async (req: Request, res: Response) => {
@@ -51,6 +57,8 @@ class AuthController {
 
       //Get user from database
       const userRepository = getRepository(User);
+      const accessCodeRepository = getRepository(AccessCode);
+
       let user: User;
 
       user = await userRepository.findOne({ where: { email } });
@@ -71,6 +79,19 @@ class AuthController {
         res.status(500).json({ success: false, data: "failed to create user" })
         return
       }
+      const code = Math.floor(Math.random() * 90000) + 10000;
+
+      let accessCode = new AccessCode()
+      accessCode.userId = `${user.id}`
+      accessCode.code = code;
+
+      accessCodeRepository.save(accessCode)
+
+      // delete access token after 10 minutes
+      setTimeout(() => accessCodeRepository.delete(accessCode), 600000)
+
+
+      mail.sendMail({ from: "i360chat@chat.com", to: email, subject: "Access Code", text: accessCodeTemplate({ code }) })
 
 
       //Send the jwt in the response
