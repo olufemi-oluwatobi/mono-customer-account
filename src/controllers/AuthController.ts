@@ -22,8 +22,8 @@ const useRepository = () => {
 class AuthController {
   static login = async (req: Request, res: Response) => {
     //Check if username and password are set
-    let { username, password } = req.body;
-    if (!(username && password)) {
+    let { email, password } = req.body;
+    if (!(email && password)) {
       res.status(400).send();
     }
 
@@ -31,12 +31,13 @@ class AuthController {
     const userRepository = getRepository(User);
     let user: User;
     try {
-      user = await userRepository.findOneOrFail({ where: { username } });
+      user = await userRepository.findOneOrFail({ where: { email, isActive: true } });
     } catch (error) {
-      res.status(401).send();
+      res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
     }
 
     //Check if encrypted password match
+    console.log(password)
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
       res.status(401).send();
       return;
@@ -50,7 +51,7 @@ class AuthController {
     );
 
     //Send the jwt in the response
-    res.status(200).json({ data: { token, user } })
+    res.status(200).json({ success: true, data: { token, user } })
   };
 
   static activate = async (req: Request, res: Response) => {
@@ -142,7 +143,7 @@ class AuthController {
 
       mail.sendMail({ from: "i360chat@chat.com", to: email, subject: "Access Code", text: accessCodeTemplate({ code }) })
 
-
+      console.log("accessCode", code)
       //Send the jwt in the response
       res.status(200).json({ success: true, data: { user } })
     } catch (error) {

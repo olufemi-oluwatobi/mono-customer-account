@@ -7,17 +7,26 @@ import { Message } from "../config/interfaces"
 class Mail {
     private transport
     constructor() {
-        this.transport = createTransport({
+    }
+
+    initTransport() {
+        return createTransport({
             host: "smtp.mailtrap.io",
-            port: 2525,
+            port: 465,
             auth: {
                 user: "7d1002c3a3ffd0",
                 pass: "9451a5121b3af1"
+            },
+
+            tls: {
+                ciphers: 'SSLv3'
             }
         });
     }
 
     async sendMail(message: Message) {
+        if (!this.transport) this.transport = this.initTransport()
+
         return new Promise((resolve, reject) => {
             this.transport.sendMail(message, function (err: Error, info: any) {
                 if (err) {
