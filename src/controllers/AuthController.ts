@@ -12,6 +12,13 @@ import accessCodeTemplate from "../templates/accesscode.template"
 const mail = container.get<Mail>(Types.MailService)
 console.log(mail)
 
+const useRepository = () => {
+  const repositories = {}
+  return (entity, name: string) => {
+    if (repositories[name]) return repositories[name]
+    return getRepository(entity)
+  }
+}
 class AuthController {
   static login = async (req: Request, res: Response) => {
     //Check if username and password are set
@@ -43,8 +50,50 @@ class AuthController {
     );
 
     //Send the jwt in the response
-    res.status(200).json({ data: { token } })
+    res.status(200).json({ data: { token, user } })
   };
+
+  static activate = async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      console.log("userId =====> ", userId)
+      const { activationCode } = req.body
+      let accessCode: AccessCode;
+      const access = useRepository()(AccessCode, "access")
+      const userRepo = useRepository()(User, "users")
+
+
+      let user = await userRepo.findOne({ id: userId })
+      console.log(user)
+      if (!user) {
+        res.status(400).json({ success: false, data: { error: "invalid user" } });
+        return;
+      }
+
+      accessCode = await access.findOne({ where: { userId, code: activationCode } })
+      if (!accessCode) {
+        res.status(400).json({ success: false, data: { error: "invalid or expired activation code" } });
+        return;
+      }
+      user.isActive = true
+      userRepo.save(user)
+      await access.remove(accessCode)
+
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        config.jwtSecret,
+        { expiresIn: "1h" }
+      );
+
+      //Send the jwt in the response
+      res.status(200).json({ data: { token, user } })
+
+    } catch (error) {
+      console.log(error)
+      res.status(401).json({ success: false, data: { error: error.toString() } });
+    }
+
+  }
 
   static signup = async (req: Request, res: Response) => {
     try {
@@ -63,7 +112,7 @@ class AuthController {
 
       user = await userRepository.findOne({ where: { email } });
       if (user) {
-        res.status(400).json({ success: false, data: "email alread exists" })
+        res.status(400).json({ success: false, data: { error: "email already exists" } })
         return
       }
       user = new User()
@@ -95,7 +144,7 @@ class AuthController {
 
 
       //Send the jwt in the response
-      res.status(200).json({ data: { user } })
+      res.status(200).json({ success: true, data: { user } })
     } catch (error) {
       console.log(error)
       res.status(401).json({ success: false, data: { error: error.toString() } });
