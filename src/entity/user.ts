@@ -32,6 +32,9 @@ export class User {
   password: string;
 
   @Column()
+  isActive: boolean = false
+
+  @Column()
   @IsNotEmpty()
   role: string;
 

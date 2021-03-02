@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
-import { getRepository, Repository, Entity } from "typeorm";
+import { getRepository, Repository, EntityOptions } from "typeorm";
 import { validate } from "class-validator";
 
 import { User, Organisation, UserOrgansisation } from "../entity";
 
 const useRepository = () => {
     const repositories = {}
-    return (entity: any, name: string) => {
+    return (entity, name: string) => {
         if (repositories[name]) return repositories[name]
         return getRepository(entity)
     }
