@@ -5,13 +5,15 @@ import {
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany
+  OneToMany,
+  JoinColumn,
+  OneToOne
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import { Organisation } from "./organisation"
 import { Channel } from "./channel"
-
+import { Profile } from "./profile"
 
 
 @Entity()
@@ -27,7 +29,7 @@ export class User {
   @Length(3, 30)
   email: string
 
-  @Column({ select: false })
+  @Column({ select: true })
   @Length(4, 100)
   password: string;
 
@@ -40,6 +42,10 @@ export class User {
 
   @OneToMany(() => Organisation, organisation => organisation.user)
   organisations: Organisation[];
+
+  @OneToOne(() => Profile)
+  @JoinColumn()
+  profile: Profile;
 
   @Column()
   @CreateDateColumn()

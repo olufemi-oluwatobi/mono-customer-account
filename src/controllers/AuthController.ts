@@ -31,7 +31,7 @@ class AuthController {
     const userRepository = getRepository(User);
     let user: User;
     try {
-      user = await userRepository.findOneOrFail({ where: { email, isActive: true } });
+      user = await userRepository.findOneOrFail({ where: { email, isActive: true }, relations: ["profile"] });
     } catch (error) {
       res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
     }
