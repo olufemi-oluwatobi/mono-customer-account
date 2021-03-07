@@ -2,12 +2,14 @@ import { Router, Request, Response } from "express";
 import auth from "./auth";
 import user from "./user";
 import organisation from "./organisation";
+import channels from "./channels";
 
 
 const routes = Router();
 
 routes.use("/auth", auth);
 routes.use("/user", user);
-routes.use("/organisation", organisation)
+routes.use("/organisations", organisation)
+routes.use("/channels", channels)
 
 export default routes;

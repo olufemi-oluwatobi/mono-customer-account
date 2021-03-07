@@ -11,9 +11,10 @@ import {
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
-import { Organisation } from "./organisation"
-import { Channel } from "./channel"
+import { UserOrgansisation } from "./userOrganisation"
+import { ChannelMembers } from "./channelMembers"
 import { Profile } from "./profile"
+import { Channel } from ".";
 
 
 @Entity()
@@ -40,8 +41,11 @@ export class User {
   @IsNotEmpty()
   role: string;
 
-  @OneToMany(() => Organisation, organisation => organisation.user)
-  organisations: Organisation[];
+  @OneToMany(type => UserOrgansisation, userOrg => userOrg.organisation)
+  userOrganisation: UserOrgansisation[];
+
+  @OneToMany(type => ChannelMembers, (d) => d.user)
+  channels: ChannelMembers[];
 
   @OneToOne(() => Profile)
   @JoinColumn()

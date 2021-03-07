@@ -5,7 +5,7 @@ import {
     Unique,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToOne,
+    OneToMany,
     JoinColumn,
     ManyToOne,
     ManyToMany
@@ -13,7 +13,7 @@ import {
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import { Organisation } from "./organisation"
-import { User } from "./user"
+import { ChannelMembers } from "./channelMembers"
 
 
 
@@ -30,17 +30,15 @@ export class Channel {
     @Column()
     description: string;
 
-    @Column()
-    @Length(4, 100)
-    isPrivate: string;
+    @OneToMany(type => ChannelMembers, channelMembers => channelMembers.channel)
+    channelMembers: ChannelMembers[];
 
     @Column()
-    @IsNotEmpty()
-    role: string;
-
+    chatID: string;
 
     @ManyToOne(() => Organisation, org => org.channels)
     organisation: Organisation;
+
 
     @Column()
     @CreateDateColumn()

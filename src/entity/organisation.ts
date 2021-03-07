@@ -7,31 +7,30 @@ import {
     UpdateDateColumn,
     JoinTable,
     ManyToMany,
-    OneToMany
+    OneToMany,
+    BeforeInsert
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
-import { User } from "./user"
+import { UserOrgansisation } from "./userOrganisation"
 import { Channel } from "./channel";
+import slugify from "slugify"
 
 @Entity()
-@Unique(["customer_chat_url", "name"])
+@Unique(["slug", "name"])
 
 export class Organisation {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    @Length(4, 20)
+    @Length(1, 30)
     name: string
 
     @Column()
-    customer_chat_url: string
+    slug: string
 
-
-    @ManyToMany(() => User, user => user.organisations)
-    @JoinTable()
-    user: User[];
-
+    @OneToMany(type => UserOrgansisation, userOrg => userOrg.user)
+    userOrganisation: UserOrgansisation[];
 
     @OneToMany(() => Channel, channel => channel.organisation)
     channels: Channel[]
@@ -43,5 +42,16 @@ export class Organisation {
     @Column()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @BeforeInsert()
+    createSlug() {
+        let name = this.name
+        name = name.replace(/-/g, ' ');
+
+        this.slug = slugify(name, {
+            replacement: "_",
+            lower: true
+        })
+    }
 
 }

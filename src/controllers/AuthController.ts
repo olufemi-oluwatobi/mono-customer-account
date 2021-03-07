@@ -21,37 +21,43 @@ const useRepository = () => {
 }
 class AuthController {
   static login = async (req: Request, res: Response) => {
-    //Check if username and password are set
-    let { email, password } = req.body;
-    if (!(email && password)) {
-      res.status(400).send();
-    }
-
-    //Get user from database
-    const userRepository = getRepository(User);
-    let user: User;
     try {
-      user = await userRepository.findOneOrFail({ where: { email, isActive: true }, relations: ["profile"] });
+      //Check if username and password are set
+      let { email, password } = req.body;
+      if (!(email && password)) {
+        res.status(400).send();
+      }
+
+      //Get user from database
+      const userRepository = getRepository(User);
+      let user: User;
+      try {
+        user = await userRepository.findOneOrFail({ where: { email, isActive: true }, relations: ["profile"] });
+      } catch (error) {
+        res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
+        return;
+      }
+
+      //Check if encrypted password match
+      console.log(password)
+      if (!user.checkIfUnencryptedPasswordIsValid(password)) {
+        res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
+        return;
+      }
+
+      //Sing JWT, valid for 1 hour
+      const token = jwt.sign(
+        { userId: user.id, username: user.username },
+        config.jwtSecret,
+        { expiresIn: "1h" }
+      );
+
+      //Send the jwt in the response
+      res.status(200).json({ success: true, data: { token, user } })
     } catch (error) {
-      res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
+      res.status(500).json({ success: false, data: { rerror: error.toString() } })
     }
 
-    //Check if encrypted password match
-    console.log(password)
-    if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-      res.status(401).send();
-      return;
-    }
-
-    //Sing JWT, valid for 1 hour
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      config.jwtSecret,
-      { expiresIn: "1h" }
-    );
-
-    //Send the jwt in the response
-    res.status(200).json({ success: true, data: { token, user } })
   };
 
   static activate = async (req: Request, res: Response) => {
@@ -87,7 +93,7 @@ class AuthController {
       );
 
       //Send the jwt in the response
-      res.status(200).json({ data: { token, user } })
+      res.status(200).json({ success: true, data: { token, user } })
 
     } catch (error) {
       console.log(error)

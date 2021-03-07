@@ -8,23 +8,24 @@ import {
     UpdateDateColumn,
     ManyToOne
 } from "typeorm";
-import { Organisation } from "./organisation"
+import { Channel } from "./channel"
 import { User } from "./user"
 
 
 
-@Entity({ name: "user_organisations" })
-export class UserOrgansisation {
+@Entity({ name: "channel_members" })
+export class ChannelMembers {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => Organisation)
-    @JoinColumn()
-    organisation: Organisation;
 
     @ManyToOne(() => User, (user) => user.id, { cascade: ["insert", "update"] })
     @JoinColumn()
     user: User;
+
+    @ManyToOne(() => Channel, (channel) => channel.id, { cascade: ["insert", "update"] })
+    @JoinColumn()
+    channel: Channel;
 
     @Column()
     role: string;
