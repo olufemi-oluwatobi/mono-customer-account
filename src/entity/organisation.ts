@@ -29,7 +29,7 @@ export class Organisation {
     @Column()
     slug: string
 
-    @OneToMany(type => UserOrgansisation, userOrg => userOrg.user)
+    @OneToMany(type => UserOrgansisation, userOrg => userOrg.organisation)
     userOrganisation: UserOrgansisation[];
 
     @OneToMany(() => Channel, channel => channel.organisation)

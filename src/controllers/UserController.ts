@@ -18,6 +18,7 @@ class UserController {
     res.send(users);
   };
 
+
   static getOneById = async (req: Request, res: Response) => {
     //Get the ID from the url
     const id: number = req.params.id;

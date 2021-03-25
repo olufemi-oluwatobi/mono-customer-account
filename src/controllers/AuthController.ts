@@ -3,6 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 import { User, AccessCode } from "../entity";
+import { Profile } from "../entity/profile";
 import config from "../config/config";
 import { container } from "../config/di/container"
 import Types from "../config/di/types"
@@ -10,7 +11,6 @@ import { Mail } from "../config/interfaces"
 import accessCodeTemplate from "../templates/accesscode.template"
 
 const mail = container.get<Mail>(Types.MailService)
-console.log(mail)
 
 const useRepository = () => {
   const repositories = {}
@@ -19,22 +19,26 @@ const useRepository = () => {
     return getRepository(entity)
   }
 }
+
+const repositories = useRepository()
+
 class AuthController {
   static login = async (req: Request, res: Response) => {
     try {
       //Check if username and password are set
-      let { email, password } = req.body;
+      let { email, password, firstName, lastName, timezone } = req.body;
       if (!(email && password)) {
         res.status(400).send();
       }
 
-      //Get user from database
-      const userRepository = getRepository(User);
       let user: User;
+
+      const userRepository = getRepository(User)
       try {
-        user = await userRepository.findOneOrFail({ where: { email, isActive: true }, relations: ["profile"] });
+        user = await userRepository.findOneOrFail({ where: { email, isActive: true } });
       } catch (error) {
-        res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
+        console.log(error)
+        res.status(401).json({ success: false, data: { error: "doesn't exist" } });
         return;
       }
 
@@ -44,6 +48,7 @@ class AuthController {
         res.status(401).json({ success: false, data: { error: "incorrect credentials" } });
         return;
       }
+
 
       //Sing JWT, valid for 1 hour
       const token = jwt.sign(
@@ -55,10 +60,12 @@ class AuthController {
       //Send the jwt in the response
       res.status(200).json({ success: true, data: { token, user } })
     } catch (error) {
-      res.status(500).json({ success: false, data: { rerror: error.toString() } })
+      res.status(500).json({ success: false, data: { error: error.toString() } })
     }
 
   };
+
+
 
   static activate = async (req: Request, res: Response) => {
     try {
@@ -66,8 +73,8 @@ class AuthController {
       console.log("userId =====> ", userId)
       const { activationCode } = req.body
       let accessCode: AccessCode;
-      const access = useRepository()(AccessCode, "access")
-      const userRepo = useRepository()(User, "users")
+      const access = repositories(AccessCode, "access")
+      const userRepo = repositories(User, "users")
 
 
       let user = await userRepo.findOne({ id: userId })
@@ -105,15 +112,31 @@ class AuthController {
   static signup = async (req: Request, res: Response) => {
     try {
       //Check if username and password are set
-      let { email, password } = req.body;
+      let { email, password, firstName, lastName, timezone, phoneNumber } = req.body;
       console.log(req.body)
       if (!(email && password)) {
         res.status(400).send();
       }
 
+      let profile = new Profile()
+      profile.firstname = firstName,
+        profile.lastName = lastName
+      profile.timezone = timezone
+      profile.phoneNumber = phoneNumber
+
+
+
+      //Get user from database
+      const profileRepository = getRepository(Profile)
+
+      profile = await profileRepository.save(profile)
+
+
       //Get user from database
       const userRepository = getRepository(User);
       const accessCodeRepository = getRepository(AccessCode);
+
+
 
       let user: User;
 
@@ -127,6 +150,8 @@ class AuthController {
       user.email = email;
       user.password = password;
       user.role = "basic";
+      user.username = `${firstName} ${lastName}`
+      user.profile = profile
       user.hashPassword()
 
       user = await userRepository.save(user)
@@ -146,8 +171,8 @@ class AuthController {
       // delete access token after 10 minutes
       setTimeout(() => accessCodeRepository.delete(accessCode), 600000)
 
-
-      mail.sendMail({ from: "i360chat@chat.com", to: email, subject: "Access Code", text: accessCodeTemplate({ code }) })
+      //change to to email
+      mail.sendMail({ from: "i360chat@chat.com", to: "olufemiotosin@gmail.com", subject: "Access Code", text: accessCodeTemplate({ code }) })
 
       console.log("accessCode", code)
       //Send the jwt in the response

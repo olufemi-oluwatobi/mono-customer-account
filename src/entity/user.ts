@@ -41,7 +41,7 @@ export class User {
   @IsNotEmpty()
   role: string;
 
-  @OneToMany(type => UserOrgansisation, userOrg => userOrg.organisation)
+  @OneToMany(type => UserOrgansisation, userOrg => userOrg.user)
   userOrganisation: UserOrgansisation[];
 
   @OneToMany(type => ChannelMembers, (d) => d.user)

@@ -8,12 +8,14 @@ import {
     OneToMany,
     JoinColumn,
     ManyToOne,
-    ManyToMany
+    ManyToMany,
+    BeforeInsert
 } from "typeorm";
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import { Organisation } from "./organisation"
 import { ChannelMembers } from "./channelMembers"
+import { v4 as uuid } from "uuid"
 
 
 
@@ -34,7 +36,7 @@ export class Channel {
     channelMembers: ChannelMembers[];
 
     @Column()
-    chatID: string;
+    chatId: string;
 
     @ManyToOne(() => Organisation, org => org.channels)
     organisation: Organisation;
@@ -47,5 +49,10 @@ export class Channel {
     @Column()
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @BeforeInsert()
+    createChannelChatId() {
+        this.chatId = `channel_${uuid()}`
+    }
 
 }

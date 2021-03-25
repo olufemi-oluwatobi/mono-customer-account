@@ -27,7 +27,7 @@ export class Profile {
     @Length(3, 30)
     lastName: string
 
-    @Column()
+    @Column({ nullable: true })
     @Length(3, 100)
     avatarUrl: string
 
@@ -36,13 +36,11 @@ export class Profile {
     phoneNumber: string;
 
     @Column()
-    timezone: boolean = false
+    timezone: string
 
-    @Column()
+    @Column({ nullable: true })
     @IsNotEmpty()
     bio: string;
-
-
 
     @Column()
     @CreateDateColumn()

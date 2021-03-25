@@ -3,6 +3,8 @@ import { Organisation } from "./organisation";
 import { Channel } from "./channel";
 import { UserOrgansisation } from "./userOrganisation";
 import { AccessCode } from "./accessCodes";
+import { Message } from "./messages"
+import { ChannelMembers } from "./channelMembers"
 
 
 export {
@@ -10,6 +12,8 @@ export {
   Organisation,
   Channel,
   UserOrgansisation,
-  AccessCode
+  AccessCode,
+  Message,
+  ChannelMembers
 };
 

@@ -2,23 +2,27 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
+    PrimaryColumn,
     JoinColumn,
     OneToOne,
-    BeforeInsert,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToOne
+    ManyToOne,
+    ManyToMany
 } from "typeorm";
-import { Organisation } from "./organisation"
-import { v4 as uuid } from "uuid"
+import { Channel } from "./channel"
 import { User } from "./user"
+import { UserOrgansisation, Organisation } from "./"
 
 
 
-@Entity({ name: "user_organisations" })
-export class UserOrgansisation {
+@Entity({ name: "messages" })
+export class Message {
     @PrimaryGeneratedColumn()
     id: number;
+
+    @Column()
+    timetoken: string
 
     @ManyToOne(() => Organisation, (org) => org.id, { cascade: ["insert", "update"] })
     @JoinColumn()
@@ -26,26 +30,26 @@ export class UserOrgansisation {
 
     @ManyToOne(() => User, (user) => user.id, { cascade: ["insert", "update"] })
     @JoinColumn()
-    user: User;
-
+    sender: User;
 
     @Column()
-    role: string;
+    reciepientId: string;
+
+    @Column()
+    chatRoomType: "direct_message" | "channel" | "support"
+
+    @Column()
+    timestamp: string
+
+    @Column()
+    text: string
 
     @Column()
     @CreateDateColumn()
     createdAt: Date;
 
     @Column()
-    chatId: string
-
-    @Column()
     @UpdateDateColumn()
     updatedAt: Date;
-
-    @BeforeInsert()
-    createUserChannelId() {
-        this.chatId = `user_${uuid()}`
-    }
 
 }

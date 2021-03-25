@@ -1,5 +1,7 @@
 import { Request, response, Response } from "express"
 import { getRepository, Repository, } from "typeorm";
+import { In } from "typeorm";
+import { v4 as uuid } from "uuid"
 import { validate } from "class-validator";
 
 import { User, Organisation, UserOrgansisation, Channel } from "../entity";
@@ -57,7 +59,7 @@ class ChannelController {
                 .where("channel.organisationId = :id", { id: org.id })
                 .getMany();
             const channelIds = userChannel.map(channel => channel.channel.id)
-            let channel = await channelRepo.find({ where: { organisation: org, id: channelIds }, relations: ["channelMembers"] })
+            let channel = await channelRepo.find({ where: { organisation: org, id: In(channelIds) }, relations: ["channelMembers", "channelMembers.user"] })
 
             res.status(200).json({ success: true, data: channel })
         } catch (error) {
@@ -73,13 +75,14 @@ class ChannelController {
             console.log(organisationId)
             let channel = new Channel()
             let channelMembers = new ChannelMembers()
-
-            channel = { ...channel, name, description }
+            channel.name = name;
+            channel.description = description
             const organisationRepo = repositories(Organisation, "organisation");
             const userRepo = repositories(User, "user")
+            const userOrgRepo = repositories(UserOrgansisation, "userOrg")
             const channelRepo = repositories(Channel, "channel")
             const channelMembersRepo = repositories(ChannelMembers, "channelMembers")
-            const user = await userRepo.findOne({ where: { id: userId } })
+            const user = await userRepo.findOne({ where: { id: userId } });
             let userOrg = await organisationRepo.createQueryBuilder('org').where("org.id = :id", { organisationId })
                 .innerJoin(
                     'org.userOrganisation',
@@ -96,7 +99,8 @@ class ChannelController {
                 })
             }
             let org: Organisation = await organisationRepo.findOne({ where: { id: organisationId } })
-
+            const orgUser = await userOrgRepo.findOne({ where: { user, organisation: org } })
+            console.log(orgUser)
             // org.channels = !org.channels ? [channel] : [...org.channels, channel]
 
             org = await organisationRepo.save(org)
@@ -108,8 +112,8 @@ class ChannelController {
                     }
                 })
             }
-            channel.chatID = `${channel.name.split(' ').join("_")}_${org.slug}_`
             channel.organisation = org
+            channel.chatId = `channel_${uuid()}`
             //channel.channelMembers = !channel.channelMembers ? [user] : [...channel.channelMembers, user]
 
             channel = await channelRepo.save({ ...channel, organisationId: org.id })
@@ -117,6 +121,8 @@ class ChannelController {
             channelMembers.channel = channel;
             channelMembers.user = user
             channelMembers.role = "admin"
+            channelMembers.chatId = orgUser.chatId
+            console.log(orgUser)
             await channelMembersRepo.save(channelMembers)
 
             res.status(201).json({ success: true, data: channel })

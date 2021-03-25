@@ -6,7 +6,8 @@ import {
     OneToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    ManyToOne
+    ManyToOne,
+    ManyToMany
 } from "typeorm";
 import { Channel } from "./channel"
 import { User } from "./user"
@@ -26,6 +27,9 @@ export class ChannelMembers {
     @ManyToOne(() => Channel, (channel) => channel.id, { cascade: ["insert", "update"] })
     @JoinColumn()
     channel: Channel;
+
+    @Column()
+    chatId: string
 
     @Column()
     role: string;
