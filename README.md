@@ -55,4 +55,4 @@ tsc
 
 ### documentation
 
-- view https://documenter.getpostman.com/view/3087547/TzCTa5fe from api documentations
+- view https://documenter.getpostman.com/view/3087547/TzCTa5fe for API documentations
