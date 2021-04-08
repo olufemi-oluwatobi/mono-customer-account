@@ -1,3 +1,5 @@
-import MessageRepository from "./messaging.repositories";
+import CustomerRepository from "./customer.repositories";
+import AccountRepository from "./account.repositories";
+import TransactionRepository from "./transaction.repositories";
 
-export { MessageRepository };
+export { CustomerRepository, AccountRepository, TransactionRepository };

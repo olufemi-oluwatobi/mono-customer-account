@@ -1,32 +1,49 @@
 import * as EventEmitter from "events"
-import { Message as Messages, UserOrgansisation } from "../entity"
+import { Customer, Account, AccountType, Transaction, AccountTransaction } from "../entities"
 
 
-export type Message = {
-    from: string, // Sender address
-    to: string,         // List of recipients
-    subject: string, // Subject line
-    text: string
-};
+export type AccountQueryParams = { id?: number | string, customer?: Customer, number?: string }
+export type CustomerQueryParams = { id?: number, name?: string }
+export type CustomerCreateBody = { name: string }
+export type AccountTypeParams = { id?: number, name?: string }
 
-type MessagePayload = {
-    channel: string,
-    subscription: string | null,
-    actualChannel: string | null,
-    subscribedChannel: string,
-    timetoken: string,
-    publisher: string,
-    message: { text: string, timestamp: string, id: number }
+export interface CustomerRepository {
+    findCustomer: (params: CustomerQueryParams) => Promise<Customer>
+    createCustomer: (body: CustomerCreateBody) => Promise<Customer>
 }
-export interface Mail {
-    sendMail(message: Message): Promise<any>
+
+export interface AccountRepository {
+    /**
+     * Create Customer Account
+     */
+    createAccount: (customer: Customer, accountType: AccountType, initialDeposit: number) => Promise<Account>;
+
+    /**
+    * find Customer account by params
+    * @param param {object} Param object
+    * @param multiple {boolean} Return one or more accounts that match param criteria
+    */
+    findAccount: (params: AccountQueryParams, multiple?: boolean, relations?: string[]) => Promise<Account>;
+
+
+    /**
+   * find Account Types  by params
+   * @param param {object} Param object
+   *
+   */
+    findAccountType: (params: AccountTypeParams) => Promise<AccountType | null>;
+
+    getTransactionHistory: (account: Account) => Promise<Transaction>
+    debit: (account: Account, amount: number, transaction: Transaction) => Promise<Account>
+    credit: (account: Account, amount: number, transaction: Transaction) => Promise<Account>
+    transactionHistory: (account: Account) => Promise<AccountTransaction>
 }
-export interface MessageRepository {
-    saveMessage: (payload: MessagePayload) => Promise<Messages>
-    findMessages: (whereClause: { orgUser: UserOrgansisation, channelIds: string[] }) => Promise<{ channelMessages: Messages[], directMessages: Messages[] }>
+
+export interface AccountServices {
+    genereteAccountNumber: (prefix?: string) => Promise<string>
 }
-export interface Messaging {
-    addChannel: (newChannels: string | string[]) => void
-    subscribe: (channels: string[]) => void
-    events: EventEmitter
+
+export interface TransactionRepository {
+    createTransaction: (sender: Account, reciepient: Account, amount: number) => Promise<Transaction>
+    getTransactionHistory: (account: Account) => Promise<Transaction>
 }

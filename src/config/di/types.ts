@@ -1,8 +1,9 @@
 
 const TYPES = {
-  MailService: Symbol("MailService"),
-  MessageService: Symbol("MessageService"),
-  MessageRepository: Symbol("MessageRepository")
+  CustomerRepository: Symbol("CustomerRepository"),
+  AccountRepository: Symbol("AccountRepository"),
+  AccountService: Symbol("AccountService"),
+  TransactionRepository: Symbol("TransactionRepository")
 };
 
 export default TYPES;

@@ -1,15 +1,17 @@
 import { Router, Request, Response } from "express";
-import auth from "./auth";
-import user from "./user";
-import organisation from "./organisation";
-import channels from "./channels";
+import { resolveContent } from "nodemailer/lib/shared";
+import account from "./accounts";
+import transaction from "./transactions";
+
 
 
 const routes = Router();
 
-routes.use("/auth", auth);
-routes.use("/user", user);
-routes.use("/organisations", organisation)
-routes.use("/channels", channels)
+
+routes.use("/account", account);
+routes.use("/transaction", transaction);
+
+
+
 
 export default routes;

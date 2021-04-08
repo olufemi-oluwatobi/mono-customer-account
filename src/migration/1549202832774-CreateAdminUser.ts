@@ -1,15 +1,23 @@
 import { MigrationInterface, QueryRunner, getRepository } from "typeorm";
-import { User } from "../entity/user";
+import { Customer } from "../entities/customer";
 
-export class CreateAdminUser1547919837483 implements MigrationInterface {
+const dummyCustomers = [
+  "Abba Kyari",
+  "Abiola Ajimobi",
+  "Prakhar Singh",
+  "Abdul Umar"
+]
+
+
+export class SeedCustomers1547919837483 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
-    let user = new User();
-    user.username = "admin";
-    user.password = "admin";
-    user.hashPassword();
-    user.role = "ADMIN";
-    const userRepository = getRepository(User);
-    await userRepository.save(user);
+    const customers = dummyCustomers.map(dummyCustomer => {
+      let customer = new Customer();
+      customer.name = dummyCustomer;
+      const customerRepository = getRepository(Customer);
+      return customerRepository.save(customer);
+    })
+    await Promise.all(customers)
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> { }
