@@ -28,12 +28,27 @@ class App {
     this.app.use(helmet());
     this.app.use(bodyParser.json());
 
+    this.defaultRoute()
+
     //Set all routes from routes folder
+
     this.app.use("/", routes);
     this.handle404s()
 
 
   }
+
+  defaultRoute() {
+    this.app.get('/', function (req, res) {
+      res.status(200).json({
+        success: true,
+        version: "1.0.0",
+        status: "running",
+        service_name: "MONO CORE SERVICE"
+      })
+    })
+  }
+
 
   start() {
     this.app.listen(PORT, () => {
