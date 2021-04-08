@@ -31,20 +31,20 @@ class App {
     this.defaultRoute()
 
     //Set all routes from routes folder
-
+  
     this.app.use("/", routes);
     this.handle404s()
 
 
   }
 
-  defaultRoute() {
-    this.app.get('/', function (req, res) {
+  defaultRoute(){
+    this.app.get('/', function(req, res){
       res.status(200).json({
         success: true,
         version: "1.0.0",
         status: "running",
-        service_name: "MONO CORE SERVICE"
+        service_name:"MONO CORE SERVICE"
       })
     })
   }
@@ -58,23 +58,9 @@ class App {
 
   handle404s = () => {
     this.app.use(function (req, res, next) {
-      res.status(404);
+      res.status(404).json({success: false, error: "resource not found"})
 
-      // respond with html page
-      if (req.accepts('html')) {
-        res.render('404', { url: req.url });
-        return;
-      }
-
-      // respond with json
-      if (req.accepts('json')) {
-        res.json({ error: 'Not found' });
-        return;
-      }
-
-      // default to plain-text. send()
-      res.type('txt').send('Not found');
-    });
+    })
   }
 
 }
