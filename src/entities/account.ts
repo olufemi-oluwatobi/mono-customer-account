@@ -5,8 +5,6 @@ import {
     ManyToOne,
     JoinColumn,
     Unique,
-    OneToOne,
-    ManyToMany,
     OneToMany
 } from "typeorm";
 import { IsNotEmpty } from "class-validator";

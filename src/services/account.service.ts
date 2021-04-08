@@ -23,14 +23,11 @@ class AccountService {
         try {
             while (!isUnique) {
                 // get random prefix
-                console.log("in here")
                 const accountPrefix = prefix || ACCOUNT_NUMBER_PREFIXES[Math.floor(Math.random() * ACCOUNT_NUMBER_PREFIXES.length)]
                 const accountDigits = Math.floor(Math.random() * 90000) + 10000;
                 accountNumber = accountPrefix + accountDigits;
-                console.log(accountNumber)
                 if (!FAILED_ACCOUNT_NUMBERS.includes(accountNumber)) {
                     const alreadyExists = await this.accountRepo.findAccount({ number: accountNumber }, false)
-                    console.log(alreadyExists)
                     if (alreadyExists) {
                         FAILED_ACCOUNT_NUMBERS.push(accountNumber)
                     } else {
@@ -42,7 +39,6 @@ class AccountService {
             return accountNumber
 
         } catch (error) {
-            console.log(error)
         }
 
 

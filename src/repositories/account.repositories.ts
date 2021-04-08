@@ -28,7 +28,6 @@ class AccountRepository {
     createAccount = async (customer: Customer, accountType: AccountType, initialDeposit: number) => {
         try {
             this.loadRepos()
-            console.log(customer, accountType, initialDeposit)
             const account = new Account()
             account.customer = customer;
             account.accountType = accountType;
@@ -38,7 +37,6 @@ class AccountRepository {
             return this.accountRepo.save(account)
         }
         catch (error) {
-            console.log(error)
         }
     }
 
@@ -51,7 +49,6 @@ class AccountRepository {
     findAccount = async (params: { id?: number, customer?: Customer, number?: number }, multiple: boolean = false, relations: string[] = []) => {
         this.loadRepos()
         const fetchMethod = multiple ? "find" : "findOne"
-
         return this.accountRepo[fetchMethod]({ where: params, relations })
     }
     debit = async (account: Account, amount: number, transaction: Transaction) => {
@@ -81,7 +78,6 @@ class AccountRepository {
     }
 
     transactionHistory = (account: Account) => {
-        console.log(account)
         this.loadRepos()
         return this.accountTransaction.find({ where: { account }, relations: ["transaction"] })
     }

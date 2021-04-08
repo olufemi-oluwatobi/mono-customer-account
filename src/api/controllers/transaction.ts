@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
-import { container, Types } from "../config/di/container"
-import { AccountRepository, TransactionRepository } from "../config/interfaces"
+import { container, Types } from "../../config/di/container"
+import { AccountRepository, TransactionRepository } from "../../config/interfaces"
 
 
 const accountRepo = container.get<AccountRepository>(Types.AccountRepository)
@@ -41,7 +41,6 @@ class TransactionController {
             return res.status(201).json({ success: true, message: "Transaction Successful", data: transaction })
 
         } catch (error) {
-            console.log(error)
             res.status(400).json({ success: false, data: error.toString() })
         }
     }
@@ -55,12 +54,10 @@ class TransactionController {
             }
 
             const accountHistory = await accountRepo.transactionHistory(account)
-            console.log(accountHistory)
             // const transactions = transactionRepo.getTransactionHistory(account)
             return res.status(200).json({ success: true, data: accountHistory })
 
         } catch (error) {
-            console.log(error)
             res.status(400).json({ success: false, data: error.toString() })
         }
     }

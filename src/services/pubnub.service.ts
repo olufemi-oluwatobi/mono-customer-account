@@ -11,7 +11,6 @@ class Messaging {
         getChannels().then(data => {
             this.channels = data
             this.subscribe(this.channels)
-            console.log(data)
 
         })
         this.events = new EventEmitter()

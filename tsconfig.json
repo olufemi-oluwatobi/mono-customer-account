@@ -1,21 +1,26 @@
 {
    "compilerOptions": {
-      "lib": [
-         "es5",
-         "es6"
-      ],
-      "target": "es5",
-      "module": "commonjs",
-      "types": ["reflect-metadata"],
-      "moduleResolution": "node",
-      "outDir": "./build",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "sourceMap": true
+       "outDir": "./dist/out-tsc",
+       "module": "commonjs",
+       "target": "es5",
+       "lib": [
+           "es6",
+           "dom"
+       ],
+       "types": ["reflect-metadata", "mocha"],
+       "noImplicitAny": false,
+       "sourceMap": false,
+       "emitDecoratorMetadata": true,
+       "experimentalDecorators": true,
+       "moduleResolution": "node",
+       "noUnusedLocals": true
    },
+   "compileOnSave": false,
+   "exclude": [
+       "node_modules"
+   ],
    "typeRoots": [
       "@types",
       "./node_modules/@types",
     ] 
-   
 }
